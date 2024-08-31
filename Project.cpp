@@ -12,8 +12,8 @@ private:
 public:
     // Constructor method using the 'this' pointer
     Vehicle(string type, int speed) {
-        this->type = type;  
-        this->speed = speed;  
+        this->type = type;
+        this->speed = speed;
     }
 
     // Function to display vehicle information
@@ -26,7 +26,7 @@ public:
         cout << this->type << " is moving at " << this->speed << " km/h." << endl;
     }
 
-    // Function to change speed using 'this' pointer
+    // Function to change speed using 'this' pointer, demonstrating method chaining
     Vehicle* accelerate(int increment) {
         this->speed += increment;
         return this;
@@ -42,8 +42,8 @@ private:
 public:
     // Constructor method using the 'this' pointer
     TrafficSignal(string color, int timer) {
-        this->color = color;  
-        this->timer = timer;  
+        this->color = color;
+        this->timer = timer;
     }
 
     // Function to change signal
@@ -59,15 +59,30 @@ public:
 };
 
 int main() {
-    // Car object for Vehicle class
-    Vehicle car("Car", 80);
-    car.displayInfo();
-    car.accelerate(20)->move();  
+    // Array of Vehicle objects
+    Vehicle vehicles[3] = {
+        Vehicle("Car", 80),
+        Vehicle("Bus", 50),
+        Vehicle("Bike", 60)
+    };
 
-    // Object for TrafficSignal class
-    TrafficSignal signal("Red", 30);
-    signal.displayStatus();
-    signal.changeSignal("Green");
+    // Display information and simulate movement for each vehicle
+    for (int i = 0; i < 3; i++) {
+        vehicles[i].displayInfo();
+        vehicles[i].move();
+    }
+
+    // Array of TrafficSignal objects
+    TrafficSignal signals[2] = {
+        TrafficSignal("Red", 30),
+        TrafficSignal("Green", 45)
+    };
+
+    // Display status and change signal for each traffic signal
+    for (int i = 0; i < 2; i++) {
+        signals[i].displayStatus();
+        signals[i].changeSignal(i == 0 ? "Green" : "Red");
+    }
 
     return 0;
 }
