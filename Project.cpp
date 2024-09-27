@@ -16,6 +16,11 @@ public:
         this->speed = speed;
     }
 
+    // Destructor to demonstrate the use of delete
+    ~Vehicle() {
+        cout << "Vehicle " << this->type << " is being destroyed" << endl;
+    }
+
     // Function to display vehicle information
     void displayInfo() {
         cout << "Vehicle Type: " << this->type << "\nSpeed: " << this->speed << " km/h" << endl;
@@ -26,7 +31,7 @@ public:
         cout << this->type << " is moving at " << this->speed << " km/h." << endl;
     }
 
-    // Function to change speed using 'this' pointer, demonstrating method chaining
+    // Function to change speed using 'this' pointer
     Vehicle* accelerate(int increment) {
         this->speed += increment;
         return this;
@@ -46,6 +51,11 @@ public:
         this->timer = timer;
     }
 
+    // Destructor to demonstrate the use of delete
+    ~TrafficSignal() {
+        cout << "Traffic signal " << this->color << " is being destroyed" << endl;
+    }
+
     // Function to change signal
     void changeSignal(string newColor) {
         this->color = newColor;
@@ -59,29 +69,37 @@ public:
 };
 
 int main() {
-    // Array of Vehicle objects
-    Vehicle vehicles[3] = {
-        Vehicle("Car", 80),
-        Vehicle("Bus", 50),
-        Vehicle("Bike", 60)
-    };
+    // Dynamically allocate memory for an array of Vehicle objects
+    Vehicle* vehicles[3];
+    vehicles[0] = new Vehicle("Car", 70);
+    vehicles[1] = new Vehicle("Bus", 50);
+    vehicles[2] = new Vehicle("Bike", 60);
 
     // Display information and simulate movement for each vehicle
     for (int i = 0; i < 3; i++) {
-        vehicles[i].displayInfo();
-        vehicles[i].move();
+        vehicles[i]->displayInfo();
+        vehicles[i]->move();
     }
 
-    // Array of TrafficSignal objects
-    TrafficSignal signals[2] = {
-        TrafficSignal("Red", 30),
-        TrafficSignal("Green", 45)
-    };
+    // Free the allocated memory for vehicles
+    for (int i = 0; i < 3; i++) {
+        delete vehicles[i];
+    }
+
+    // Dynamically allocate memory for an array of TrafficSignal objects
+    TrafficSignal* signals[2];
+    signals[0] = new TrafficSignal("Red", 30);
+    signals[1] = new TrafficSignal("Green", 45);
 
     // Display status and change signal for each traffic signal
     for (int i = 0; i < 2; i++) {
-        signals[i].displayStatus();
-        signals[i].changeSignal(i == 0 ? "Green" : "Red");
+        signals[i]->displayStatus();
+        signals[i]->changeSignal(i == 0 ? "Green" : "Red");
+    }
+
+    // Free the allocated memory for signals
+    for (int i = 0; i < 2; i++) {
+        delete signals[i];
     }
 
     return 0;
