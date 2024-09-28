@@ -9,6 +9,9 @@ using namespace std;
 class Vehicle
 {
 private:
+    /*
+     * Private variables of the Vehicle class
+     */
     string type;
     int speed;
 
@@ -104,6 +107,9 @@ int Vehicle::totalSpeed = 0;
 class TrafficSignal
 {
 private:
+    /*
+     * Private variables of the TrafficSignal class
+     */
     string color;
     int timer;
 
