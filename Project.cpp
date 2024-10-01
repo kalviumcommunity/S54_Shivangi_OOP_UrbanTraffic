@@ -162,6 +162,9 @@ public:
 int main()
 {
     Vehicle *vehicles[3];
+    /*
+     * Creating objects of the Vehicle class using constructors
+     */
     vehicles[0] = new Vehicle("Car", 80);
     vehicles[1] = new Vehicle("Bus", 50);
     vehicles[2] = new Vehicle("Bike", 60);
@@ -176,24 +179,28 @@ int main()
     Vehicle::displayTotalSpeed();
     cout << "Average Speed of All Vehicles: " << Vehicle::averageSpeed() << " km/h" << endl;
 
-    TrafficSignal signals[2] = {
-        TrafficSignal("Red", 30),
-        TrafficSignal("Green", 45)};
+    TrafficSignal *signals[2];
+    signals[0] = new TrafficSignal("Red", 30);
+    signals[1] = new TrafficSignal("Green", 45);
 
     for (int i = 0; i < 2; i++)
     {
-        signals[i].displayStatus();
-        signals[i].changeSignal(i == 0 ? "Green" : "Red");
+        signals[i]->displayStatus();
+        signals[i]->changeSignal(i == 0 ? "Green" : "Red");
     }
 
+    /*
+     * Deleting the objects by calling destructors
+     */
     for (int i = 0; i < 3; i++)
     {
         delete vehicles[i];
     }
 
-    Vehicle::displayVehicleCount();
-    Vehicle::displayTotalSpeed();
-    cout << "Average Speed of All Vehicles: " << Vehicle::averageSpeed() << " km/h" << endl;
+    for (int i = 0; i < 2; i++)
+    {
+        delete signals[i];
+    }
 
     return 0;
 }
