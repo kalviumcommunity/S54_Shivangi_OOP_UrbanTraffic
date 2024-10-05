@@ -102,6 +102,49 @@ int Vehicle::vehicleCount = 0;
 int Vehicle::totalSpeed = 0;
 
 /*
+ * Car class inherits from the Vehicle class (Single Inheritance)
+ */
+class Car : public Vehicle
+{
+public:
+    Car(int speed) : Vehicle("Car", speed) {}
+
+    void honkHorn()
+    {
+        cout << "HONK! HONK!" << endl;
+    }
+};
+
+/*
+ * Bike class inherits from the Vehicle class (Single Inheritance)
+ */
+class Bike : public Vehicle
+{
+public:
+    Bike(int speed) : Vehicle("Bike", speed) {}
+
+    void pedal()
+    {
+        cout << "Pedaling..." << endl;
+    }
+};
+
+/*
+ * ElectricCar class inherits from the Car class (Multilevel Inheritance)
+ */
+class ElectricCar : public Car
+{
+    int batteryLevel;
+
+public:
+    ElectricCar(int speed, int batteryLevel) : Car(speed), batteryLevel(batteryLevel) {}
+    void charge()
+    {
+        cout << "Charging..." << endl;
+    }
+};
+
+/*
  * Class to represent a traffic signal
  */
 class TrafficSignal
@@ -163,17 +206,26 @@ int main()
 {
     Vehicle *vehicles[3];
     /*
-     * Creating objects of the Vehicle class using constructors
+     * Creating objects of the inherited classes using constructors
      */
-    vehicles[0] = new Vehicle("Car", 80);
-    vehicles[1] = new Vehicle("Bus", 50);
-    vehicles[2] = new Vehicle("Bike", 60);
+    vehicles[0] = new Car(80);
+    vehicles[1] = new ElectricCar(50, 100);
+    vehicles[2] = new Bike(20);
 
     for (int i = 0; i < 3; i++)
     {
         vehicles[i]->displayInfo();
         vehicles[i]->move();
     }
+
+    /*
+     * Calling methods of inherited classes
+     */
+    static_cast<Car *>(vehicles[0])->honkHorn();
+
+    static_cast<ElectricCar *>(vehicles[1])->charge();
+
+    static_cast<Bike *>(vehicles[2])->pedal();
 
     Vehicle::displayVehicleCount();
     Vehicle::displayTotalSpeed();
