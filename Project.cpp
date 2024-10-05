@@ -50,6 +50,14 @@ public:
     }
 
     /*
+     * Overloaded method to display information with an additional parameter for the fuel type
+     */
+    void displayInfo(string fuelType)
+    {
+        cout << "Vehicle Type: " << this->type << "\nSpeed: " << this->speed << " km/h\nFuel Type: " << fuelType << endl;
+    }
+
+    /*
      * Static method to display the total number of Vehicle objects
      */
     static void displayVehicleCount()
@@ -226,6 +234,13 @@ int main()
     static_cast<ElectricCar *>(vehicles[1])->charge();
 
     static_cast<Bike *>(vehicles[2])->pedal();
+
+    /*
+     * Demonstrating function overloading
+     */
+    vehicles[0]->displayInfo("Petrol");
+    vehicles[1]->displayInfo("Electric");
+    vehicles[2]->displayInfo("No fuel");
 
     Vehicle::displayVehicleCount();
     Vehicle::displayTotalSpeed();
