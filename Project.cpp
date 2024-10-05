@@ -4,7 +4,7 @@
 using namespace std;
 
 /*
- * Class to represent a vehicle
+ * Abstract class to represent a vehicle
  */
 class Vehicle
 {
@@ -24,10 +24,8 @@ public:
      * @param type the type of the vehicle
      * @param speed the speed of the vehicle
      */
-    Vehicle(string type, int speed)
+    Vehicle(string type, int speed) : type(type), speed(speed)
     {
-        this->type = type;
-        this->speed = speed;
         vehicleCount++;
         totalSpeed += speed;
     }
@@ -35,27 +33,17 @@ public:
     /*
      * Destructor to release the resources of a Vehicle object
      */
-    ~Vehicle()
+    virtual ~Vehicle()
     {
         vehicleCount--;
         totalSpeed -= speed;
     }
 
     /*
-     * Method to display the information of a Vehicle object
+     * Pure virtual method to display the information of a Vehicle object
+     * Making this a pure virtual function makes Vehicle an abstract class
      */
-    void displayInfo()
-    {
-        cout << "Vehicle Type: " << this->type << "\nSpeed: " << this->speed << " km/h" << endl;
-    }
-
-    /*
-     * Overloaded method to display information with an additional parameter for the fuel type
-     */
-    void displayInfo(string fuelType)
-    {
-        cout << "Vehicle Type: " << this->type << "\nSpeed: " << this->speed << " km/h\nFuel Type: " << fuelType << endl;
-    }
+    virtual void displayInfo() = 0; // pure virtual
 
     /*
      * Static method to display the total number of Vehicle objects
@@ -117,6 +105,14 @@ class Car : public Vehicle
 public:
     Car(int speed) : Vehicle("Car", speed) {}
 
+    /*
+     * Override the displayInfo() method
+     */
+    void displayInfo() override
+    {
+        cout << "Vehicle Type: " << getType() << "\nSpeed: " << getSpeed() << " km/h" << endl;
+    }
+
     void honkHorn()
     {
         cout << "HONK! HONK!" << endl;
@@ -130,6 +126,14 @@ class Bike : public Vehicle
 {
 public:
     Bike(int speed) : Vehicle("Bike", speed) {}
+
+    /*
+     * Override the displayInfo() method
+     */
+    void displayInfo() override
+    {
+        cout << "Vehicle Type: " << getType() << "\nSpeed: " << getSpeed() << " km/h" << endl;
+    }
 
     void pedal()
     {
@@ -146,6 +150,15 @@ class ElectricCar : public Car
 
 public:
     ElectricCar(int speed, int batteryLevel) : Car(speed), batteryLevel(batteryLevel) {}
+
+    /*
+     * Override the displayInfo() method
+     */
+    void displayInfo() override
+    {
+        cout << "Vehicle Type: " << getType() << "\nSpeed: " << getSpeed() << " km/h\nBattery Level: " << batteryLevel << "%" << endl;
+    }
+
     void charge()
     {
         cout << "Charging..." << endl;
@@ -222,7 +235,7 @@ int main()
 
     for (int i = 0; i < 3; i++)
     {
-        vehicles[i]->displayInfo();
+        vehicles[i]->displayInfo(); // Calls the overridden method
         vehicles[i]->move();
     }
 
@@ -230,17 +243,15 @@ int main()
      * Calling methods of inherited classes
      */
     static_cast<Car *>(vehicles[0])->honkHorn();
-
     static_cast<ElectricCar *>(vehicles[1])->charge();
-
     static_cast<Bike *>(vehicles[2])->pedal();
 
     /*
      * Demonstrating function overloading
      */
-    vehicles[0]->displayInfo("Petrol");
-    vehicles[1]->displayInfo("Electric");
-    vehicles[2]->displayInfo("No fuel");
+    vehicles[0]->displayInfo();
+    vehicles[1]->displayInfo();
+    vehicles[2]->displayInfo();
 
     Vehicle::displayVehicleCount();
     Vehicle::displayTotalSpeed();
