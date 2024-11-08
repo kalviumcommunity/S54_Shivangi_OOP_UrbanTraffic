@@ -20,7 +20,16 @@ public:
     static int totalSpeed;
 
     /*
-     * Constructor to create a Vehicle object
+     * Default constructor
+     */
+    Vehicle() : type("Unknown"), speed(0)
+    {
+        vehicleCount++;
+        cout << "Default Vehicle constructor called." << endl;
+    }
+
+    /*
+     * Parameterized constructor to create a Vehicle object
      * @param type the type of the vehicle
      * @param speed the speed of the vehicle
      */
@@ -28,6 +37,7 @@ public:
     {
         vehicleCount++;
         totalSpeed += speed;
+        cout << "Parameterized Vehicle constructor called." << endl;
     }
 
     /*
@@ -37,13 +47,33 @@ public:
     {
         vehicleCount--;
         totalSpeed -= speed;
+        cout << "Vehicle destructor called." << endl;
     }
 
     /*
      * Pure virtual method to display the information of a Vehicle object
-     * Making this a pure virtual function makes Vehicle an abstract class
      */
     virtual void displayInfo() = 0; // pure virtual
+
+    /*
+     * Method to simulate the movement of a Vehicle object
+     */
+    void move()
+    {
+        cout << this->type << " is moving at " << this->speed << " km/h." << endl;
+    }
+
+    /*
+     * Setter functions for type and speed
+     */
+    void setType(string type) { this->type = type; }
+    void setSpeed(int speed) { this->speed = speed; }
+
+    /*
+     * Getter functions for type and speed
+     */
+    string getType() { return type; }
+    int getSpeed() { return speed; }
 
     /*
      * Static method to display the total number of Vehicle objects
@@ -69,26 +99,6 @@ public:
     {
         return vehicleCount > 0 ? static_cast<double>(totalSpeed) / vehicleCount : 0;
     }
-
-    /*
-     * Method to simulate the movement of a Vehicle object
-     */
-    void move()
-    {
-        cout << this->type << " is moving at " << this->speed << " km/h." << endl;
-    }
-
-    /*
-     * Setter functions for type and speed
-     */
-    void setType(string type) { this->type = type; }
-    void setSpeed(int speed) { this->speed = speed; }
-
-    /*
-     * Getter functions for type and speed
-     */
-    string getType() { return type; }
-    int getSpeed() { return speed; }
 };
 
 /*
@@ -103,6 +113,7 @@ int Vehicle::totalSpeed = 0;
 class Car : public Vehicle
 {
 public:
+    Car() : Vehicle("Car", 60) {} // Default Car constructor with predefined speed
     Car(int speed) : Vehicle("Car", speed) {}
 
     /*
@@ -125,6 +136,7 @@ public:
 class Bike : public Vehicle
 {
 public:
+    Bike() : Vehicle("Bike", 15) {} // Default Bike constructor with predefined speed
     Bike(int speed) : Vehicle("Bike", speed) {}
 
     /*
@@ -149,7 +161,14 @@ class ElectricCar : public Car
     int batteryLevel;
 
 public:
-    ElectricCar(int speed, int batteryLevel) : Car(speed), batteryLevel(batteryLevel) {}
+    ElectricCar() : Car(), batteryLevel(100) // Default ElectricCar constructor
+    {
+        cout << "Default ElectricCar constructor called." << endl;
+    }
+    ElectricCar(int speed, int batteryLevel) : Car(speed), batteryLevel(batteryLevel)
+    {
+        cout << "Parameterized ElectricCar constructor called." << endl;
+    }
 
     /*
      * Override the displayInfo() method
@@ -179,14 +198,21 @@ private:
 
 public:
     /*
-     * Constructor to create a TrafficSignal object
+     * Default constructor
+     */
+    TrafficSignal() : color("Red"), timer(60)
+    {
+        cout << "Default TrafficSignal constructor called." << endl;
+    }
+
+    /*
+     * Parameterized constructor
      * @param color the color of the traffic signal
      * @param timer the timer of the traffic signal
      */
-    TrafficSignal(string color, int timer)
+    TrafficSignal(string color, int timer) : color(color), timer(timer)
     {
-        this->color = color;
-        this->timer = timer;
+        cout << "Parameterized TrafficSignal constructor called." << endl;
     }
 
     /*
@@ -195,8 +221,8 @@ public:
      */
     void changeSignal(string newColor)
     {
-        this->color = newColor;
-        cout << "Traffic signal changed to " << this->color << endl;
+        color = newColor;
+        cout << "Traffic signal changed to " << color << endl;
     }
 
     /*
@@ -204,7 +230,7 @@ public:
      */
     void displayStatus()
     {
-        cout << "Traffic Signal: " << this->color << "\nTimer: " << this->timer << " seconds" << endl;
+        cout << "Traffic Signal: " << color << "\nTimer: " << timer << " seconds" << endl;
     }
 
     /*
@@ -229,37 +255,27 @@ int main()
     /*
      * Creating objects of the inherited classes using constructors
      */
-    vehicles[0] = new Car(80);
-    vehicles[1] = new ElectricCar(50, 100);
-    vehicles[2] = new Bike(20);
+    vehicles[0] = new Car(80);              // Parameterized Car constructor
+    vehicles[1] = new ElectricCar(50, 100); // Parameterized ElectricCar constructor
+    vehicles[2] = new Bike();               // Default Bike constructor
 
     for (int i = 0; i < 3; i++)
     {
-        vehicles[i]->displayInfo(); // Calls the overridden method
+        vehicles[i]->displayInfo();
         vehicles[i]->move();
     }
 
-    /*
-     * Calling methods of inherited classes
-     */
     static_cast<Car *>(vehicles[0])->honkHorn();
     static_cast<ElectricCar *>(vehicles[1])->charge();
     static_cast<Bike *>(vehicles[2])->pedal();
-
-    /*
-     * Demonstrating function overloading
-     */
-    vehicles[0]->displayInfo();
-    vehicles[1]->displayInfo();
-    vehicles[2]->displayInfo();
 
     Vehicle::displayVehicleCount();
     Vehicle::displayTotalSpeed();
     cout << "Average Speed of All Vehicles: " << Vehicle::averageSpeed() << " km/h" << endl;
 
     TrafficSignal *signals[2];
-    signals[0] = new TrafficSignal("Red", 30);
-    signals[1] = new TrafficSignal("Green", 45);
+    signals[0] = new TrafficSignal();            // Default TrafficSignal constructor
+    signals[1] = new TrafficSignal("Green", 45); // Parameterized TrafficSignal constructor
 
     for (int i = 0; i < 2; i++)
     {
@@ -267,9 +283,6 @@ int main()
         signals[i]->changeSignal(i == 0 ? "Green" : "Red");
     }
 
-    /*
-     * Deleting the objects by calling destructors
-     */
     for (int i = 0; i < 3; i++)
     {
         delete vehicles[i];
