@@ -4,9 +4,20 @@
 using namespace std;
 
 /*
- * Class to represent a vehicle
+ * Abstract base class to represent a general vehicle
  */
-class Vehicle
+class VehicleBase
+{
+public:
+    virtual void move() = 0;          // Pure virtual function
+    virtual void displayInfo() = 0;  // Virtual function
+    virtual ~VehicleBase() {}        // Virtual destructor
+};
+
+/*
+ * Class to represent a vehicle, inheriting from VehicleBase
+ */
+class Vehicle : public VehicleBase
 {
 private:
     string type;
@@ -16,10 +27,8 @@ public:
     static int vehicleCount;
     static int totalSpeed;
 
-    Vehicle(string type, int speed)
+    Vehicle(string type, int speed) : type(type), speed(speed)
     {
-        this->type = type;
-        this->speed = speed;
         vehicleCount++;
         totalSpeed += speed;
     }
@@ -30,7 +39,12 @@ public:
         totalSpeed -= speed;
     }
 
-    void displayInfo()
+    void move() override
+    {
+        cout << this->type << " is moving at " << this->speed << " km/h." << endl;
+    }
+
+    void displayInfo() override
     {
         cout << "Vehicle Type: " << this->type << "\nSpeed: " << this->speed << " km/h" << endl;
     }
@@ -50,22 +64,7 @@ public:
         return vehicleCount > 0 ? static_cast<double>(totalSpeed) / vehicleCount : 0;
     }
 
-    /*
-     * Overloaded move() methods to demonstrate polymorphism
-     */
-    void move()
-    {
-        cout << this->type << " is moving at " << this->speed << " km/h." << endl;
-    }
-
-    void move(int distance)
-    {
-        cout << this->type << " is moving at " << this->speed << " km/h for " << distance << " km." << endl;
-    }
-
-    void setType(string type) { this->type = type; }
-    void setSpeed(int speed) { this->speed = speed; }
-
+protected:
     string getType() { return type; }
     int getSpeed() { return speed; }
 };
@@ -74,12 +73,17 @@ int Vehicle::vehicleCount = 0;
 int Vehicle::totalSpeed = 0;
 
 /*
- * Car class inherits from the Vehicle class (Single Inheritance)
+ * Car class inherits from Vehicle
  */
 class Car : public Vehicle
 {
 public:
     Car(int speed) : Vehicle("Car", speed) {}
+
+    void move() override
+    {
+        cout << "Car is cruising at " << getSpeed() << " km/h." << endl;
+    }
 
     void honkHorn()
     {
@@ -88,12 +92,17 @@ public:
 };
 
 /*
- * Bike class inherits from the Vehicle class (Single Inheritance)
+ * Bike class inherits from Vehicle
  */
 class Bike : public Vehicle
 {
 public:
     Bike(int speed) : Vehicle("Bike", speed) {}
+
+    void move() override
+    {
+        cout << "Bike is pedaling at " << getSpeed() << " km/h." << endl;
+    }
 
     void pedal()
     {
@@ -102,7 +111,7 @@ public:
 };
 
 /*
- * ElectricCar class inherits from the Car class (Multilevel Inheritance)
+ * ElectricCar class inherits from Car
  */
 class ElectricCar : public Car
 {
@@ -110,6 +119,12 @@ class ElectricCar : public Car
 
 public:
     ElectricCar(int speed, int batteryLevel) : Car(speed), batteryLevel(batteryLevel) {}
+
+    void move() override
+    {
+        cout << "Electric Car is gliding at " << getSpeed() << " km/h with " << batteryLevel << "% battery." << endl;
+    }
+
     void charge()
     {
         cout << "Charging..." << endl;
@@ -176,26 +191,30 @@ public:
  */
 int main()
 {
-    Vehicle *vehicles[3];
-    vehicles[0] = new Car(80);
-    vehicles[1] = new ElectricCar(50, 100);
-    vehicles[2] = new Bike(20);
+    // Create an array of pointers to VehicleBase
+    VehicleBase *vehicles[3];
+    vehicles[0] = new Car(80);            // Car object
+    vehicles[1] = new ElectricCar(50, 100); // ElectricCar object
+    vehicles[2] = new Bike(20);           // Bike object
 
+    // Demonstrate polymorphism through the move() function
     for (int i = 0; i < 3; i++)
     {
         vehicles[i]->displayInfo();
-        vehicles[i]->move();   // Calls the default move()
-        vehicles[i]->move(10); // Calls the overloaded move(int)
+        vehicles[i]->move();
     }
 
+    // Specific functionality of derived classes
     static_cast<Car *>(vehicles[0])->honkHorn();
     static_cast<ElectricCar *>(vehicles[1])->charge();
     static_cast<Bike *>(vehicles[2])->pedal();
 
+    // Static member function calls
     Vehicle::displayVehicleCount();
     Vehicle::displayTotalSpeed();
     cout << "Average Speed of All Vehicles: " << Vehicle::averageSpeed() << " km/h" << endl;
 
+    // Clean up dynamically allocated objects
     for (int i = 0; i < 3; i++)
     {
         delete vehicles[i];
@@ -203,3 +222,4 @@ int main()
 
     return 0;
 }
+
