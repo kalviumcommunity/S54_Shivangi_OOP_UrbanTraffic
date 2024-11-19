@@ -4,66 +4,95 @@
 using namespace std;
 
 /*
- * Abstract class to represent a vehicle, showcasing abstraction
+ * Class to represent a vehicle
  */
 class Vehicle
 {
 private:
-    string type; // Type of vehicle, private to restrict direct access
-    int speed;   // Speed of vehicle, private to enforce encapsulation
-
-protected:
     /*
-     * Protected function to set type and speed, accessible by derived classes
+     * Private variables of the Vehicle class
      */
-    void setAttributes(string type, int speed)
-    {
-        this->type = type;
-        this->speed = speed;
-    }
+    string type;
+    int speed;
 
 public:
     static int vehicleCount;
     static int totalSpeed;
 
-    Vehicle() : type("Unknown"), speed(0)
+    /*
+     * Constructor to create a Vehicle object
+     * @param type the type of the vehicle
+     * @param speed the speed of the vehicle
+     */
+    Vehicle(string type, int speed)
     {
+        this->type = type;
+        this->speed = speed;
         vehicleCount++;
+        totalSpeed += speed;
     }
 
-    virtual ~Vehicle()
+    /*
+     * Destructor to release the resources of a Vehicle object
+     */
+    ~Vehicle()
     {
         vehicleCount--;
         totalSpeed -= speed;
     }
 
     /*
-     * Pure virtual method to enforce specific information display in derived classes
+     * Method to display the information of a Vehicle object
      */
-    virtual void displayInfo() = 0;
-
-    void move()
+    void displayInfo()
     {
-        cout << type << " is moving at " << speed << " km/h." << endl;
+        cout << "Vehicle Type: " << this->type << "\nSpeed: " << this->speed << " km/h" << endl;
     }
 
-    string getType() const { return type; } // Public getter for type
-    int getSpeed() const { return speed; }  // Public getter for speed
-
+    /*
+     * Static method to display the total number of Vehicle objects
+     */
     static void displayVehicleCount()
     {
         cout << "Total Vehicles: " << vehicleCount << endl;
     }
 
+    /*
+     * Static method to display the total speed of all Vehicle objects
+     */
     static void displayTotalSpeed()
     {
         cout << "Total Speed of All Vehicles: " << totalSpeed << " km/h" << endl;
     }
 
+    /*
+     * Static method to calculate the average speed of all Vehicle objects
+     * @return the average speed of all Vehicle objects
+     */
     static double averageSpeed()
     {
         return vehicleCount > 0 ? static_cast<double>(totalSpeed) / vehicleCount : 0;
     }
+
+    /*
+     * Method to simulate the movement of a Vehicle object
+     */
+    void move()
+    {
+        cout << this->type << " is moving at " << this->speed << " km/h." << endl;
+    }
+
+    /*
+     * Setter functions for type and speed
+     */
+    void setType(string type) { this->type = type; }
+    void setSpeed(int speed) { this->speed = speed; }
+
+    /*
+     * Getter functions for type and speed
+     */
+    string getType() { return type; }
+    int getSpeed() { return speed; }
 };
 
 /*
@@ -73,25 +102,12 @@ int Vehicle::vehicleCount = 0;
 int Vehicle::totalSpeed = 0;
 
 /*
- * Car class, inheriting from Vehicle, demonstrating abstraction with an added feature
+ * Car class inherits from the Vehicle class (Single Inheritance)
  */
 class Car : public Vehicle
 {
-private:
-    string engineType; // Private member to highlight encapsulation
-
 public:
-    Car(int speed, string engineType = "Petrol") : engineType(engineType)
-    {
-        setAttributes("Car", speed);
-        totalSpeed += speed;
-    }
-
-    void displayInfo() override
-    {
-        cout << "Vehicle Type: " << getType() << "\nSpeed: " << getSpeed() << " km/h"
-             << "\nEngine Type: " << engineType << endl;
-    }
+    Car(int speed) : Vehicle("Car", speed) {}
 
     void honkHorn()
     {
@@ -100,21 +116,12 @@ public:
 };
 
 /*
- * Bike class, inheriting from Vehicle, with unique attributes
+ * Bike class inherits from the Vehicle class (Single Inheritance)
  */
 class Bike : public Vehicle
 {
 public:
-    Bike(int speed) 
-    {
-        setAttributes("Bike", speed);
-        totalSpeed += speed;
-    }
-
-    void displayInfo() override
-    {
-        cout << "Vehicle Type: " << getType() << "\nSpeed: " << getSpeed() << " km/h" << endl;
-    }
+    Bike(int speed) : Vehicle("Bike", speed) {}
 
     void pedal()
     {
@@ -123,24 +130,14 @@ public:
 };
 
 /*
- * ElectricCar class inherits from Car to demonstrate multilevel inheritance and abstraction
+ * ElectricCar class inherits from the Car class (Multilevel Inheritance)
  */
 class ElectricCar : public Car
 {
-private:
     int batteryLevel;
 
 public:
-    ElectricCar(int speed, int batteryLevel) : Car(speed, "Electric"), batteryLevel(batteryLevel)
-    {
-    }
-
-    void displayInfo() override
-    {
-        cout << "Vehicle Type: " << getType() << "\nSpeed: " << getSpeed() << " km/h"
-             << "\nBattery Level: " << batteryLevel << "%" << endl;
-    }
-
+    ElectricCar(int speed, int batteryLevel) : Car(speed), batteryLevel(batteryLevel) {}
     void charge()
     {
         cout << "Charging..." << endl;
@@ -148,45 +145,72 @@ public:
 };
 
 /*
- * Class representing a Traffic Signal with encapsulated attributes and methods
+ * Class to represent a traffic signal
  */
 class TrafficSignal
 {
 private:
-    string color; // Restricted access to ensure encapsulation
-    int timer;    // Timer for signal change, private for data hiding
+    /*
+     * Private variables of the TrafficSignal class
+     */
+    string color;
+    int timer;
 
 public:
-    TrafficSignal(string color, int timer) : color(color), timer(timer) {}
+    /*
+     * Constructor to create a TrafficSignal object
+     * @param color the color of the traffic signal
+     * @param timer the timer of the traffic signal
+     */
+    TrafficSignal(string color, int timer)
+    {
+        this->color = color;
+        this->timer = timer;
+    }
 
+    /*
+     * Method to change the color of a TrafficSignal object
+     * @param newColor the new color of the traffic signal
+     */
     void changeSignal(string newColor)
     {
-        color = newColor;
-        cout << "Traffic signal changed to " << color << endl;
+        this->color = newColor;
+        cout << "Traffic signal changed to " << this->color << endl;
     }
 
+    /*
+     * Method to display the status of a TrafficSignal object
+     */
     void displayStatus()
     {
-        cout << "Traffic Signal: " << color << "\nTimer: " << timer << " seconds" << endl;
+        cout << "Traffic Signal: " << this->color << "\nTimer: " << this->timer << " seconds" << endl;
     }
 
-    void setColor(string color) { this->color = color; } // Setter with restricted access
-    void setTimer(int timer) { this->timer = timer; }    // Setter with restricted access
+    /*
+     * Setter functions for color and timer
+     */
+    void setColor(string color) { this->color = color; }
+    void setTimer(int timer) { this->timer = timer; }
 
-    string getColor() const { return color; } // Getter to access private color
-    int getTimer() const { return timer; }    // Getter to access private timer
+    /*
+     * Getter functions for color and timer
+     */
+    string getColor() { return color; }
+    int getTimer() { return timer; }
 };
 
 /*
- * Main function to demonstrate abstraction in action
+ * Main function
  */
 int main()
 {
-    Vehicle* vehicles[3];
-
-    vehicles[0] = new Car(80, "Petrol");       // Car with petrol engine
-    vehicles[1] = new ElectricCar(50, 100);    // Electric car with battery level
-    vehicles[2] = new Bike(20);                // Bike with speed
+    Vehicle *vehicles[3];
+    /*
+     * Creating objects of the inherited classes using constructors
+     */
+    vehicles[0] = new Car(80);
+    vehicles[1] = new ElectricCar(50, 100);
+    vehicles[2] = new Bike(20);
 
     for (int i = 0; i < 3; i++)
     {
@@ -194,15 +218,20 @@ int main()
         vehicles[i]->move();
     }
 
-    static_cast<Car*>(vehicles[0])->honkHorn();
-    static_cast<ElectricCar*>(vehicles[1])->charge();
-    static_cast<Bike*>(vehicles[2])->pedal();
+    /*
+     * Calling methods of inherited classes
+     */
+    static_cast<Car *>(vehicles[0])->honkHorn();
+
+    static_cast<ElectricCar *>(vehicles[1])->charge();
+
+    static_cast<Bike *>(vehicles[2])->pedal();
 
     Vehicle::displayVehicleCount();
     Vehicle::displayTotalSpeed();
     cout << "Average Speed of All Vehicles: " << Vehicle::averageSpeed() << " km/h" << endl;
 
-    TrafficSignal* signals[2];
+    TrafficSignal *signals[2];
     signals[0] = new TrafficSignal("Red", 30);
     signals[1] = new TrafficSignal("Green", 45);
 
@@ -212,6 +241,9 @@ int main()
         signals[i]->changeSignal(i == 0 ? "Green" : "Red");
     }
 
+    /*
+     * Deleting the objects by calling destructors
+     */
     for (int i = 0; i < 3; i++)
     {
         delete vehicles[i];
