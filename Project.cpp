@@ -9,9 +9,6 @@ using namespace std;
 class Vehicle
 {
 private:
-    /*
-     * Private variables of the Vehicle class
-     */
     string type;
     int speed;
 
@@ -19,11 +16,6 @@ public:
     static int vehicleCount;
     static int totalSpeed;
 
-    /*
-     * Constructor to create a Vehicle object
-     * @param type the type of the vehicle
-     * @param speed the speed of the vehicle
-     */
     Vehicle(string type, int speed)
     {
         this->type = type;
@@ -32,72 +24,52 @@ public:
         totalSpeed += speed;
     }
 
-    /*
-     * Destructor to release the resources of a Vehicle object
-     */
     ~Vehicle()
     {
         vehicleCount--;
         totalSpeed -= speed;
     }
 
-    /*
-     * Method to display the information of a Vehicle object
-     */
     void displayInfo()
     {
         cout << "Vehicle Type: " << this->type << "\nSpeed: " << this->speed << " km/h" << endl;
     }
 
-    /*
-     * Static method to display the total number of Vehicle objects
-     */
     static void displayVehicleCount()
     {
         cout << "Total Vehicles: " << vehicleCount << endl;
     }
 
-    /*
-     * Static method to display the total speed of all Vehicle objects
-     */
     static void displayTotalSpeed()
     {
         cout << "Total Speed of All Vehicles: " << totalSpeed << " km/h" << endl;
     }
 
-    /*
-     * Static method to calculate the average speed of all Vehicle objects
-     * @return the average speed of all Vehicle objects
-     */
     static double averageSpeed()
     {
         return vehicleCount > 0 ? static_cast<double>(totalSpeed) / vehicleCount : 0;
     }
 
     /*
-     * Method to simulate the movement of a Vehicle object
+     * Overloaded move() methods to demonstrate polymorphism
      */
     void move()
     {
         cout << this->type << " is moving at " << this->speed << " km/h." << endl;
     }
 
-    /*
-     * Setter functions for type and speed
-     */
+    void move(int distance)
+    {
+        cout << this->type << " is moving at " << this->speed << " km/h for " << distance << " km." << endl;
+    }
+
     void setType(string type) { this->type = type; }
     void setSpeed(int speed) { this->speed = speed; }
 
-    /*
-     * Getter functions for type and speed
-     */
     string getType() { return type; }
     int getSpeed() { return speed; }
 };
 
-/*
- * Static variables of the Vehicle class
- */
 int Vehicle::vehicleCount = 0;
 int Vehicle::totalSpeed = 0;
 
@@ -205,9 +177,6 @@ public:
 int main()
 {
     Vehicle *vehicles[3];
-    /*
-     * Creating objects of the inherited classes using constructors
-     */
     vehicles[0] = new Car(80);
     vehicles[1] = new ElectricCar(50, 100);
     vehicles[2] = new Bike(20);
@@ -215,43 +184,21 @@ int main()
     for (int i = 0; i < 3; i++)
     {
         vehicles[i]->displayInfo();
-        vehicles[i]->move();
+        vehicles[i]->move();   // Calls the default move()
+        vehicles[i]->move(10); // Calls the overloaded move(int)
     }
 
-    /*
-     * Calling methods of inherited classes
-     */
     static_cast<Car *>(vehicles[0])->honkHorn();
-
     static_cast<ElectricCar *>(vehicles[1])->charge();
-
     static_cast<Bike *>(vehicles[2])->pedal();
 
     Vehicle::displayVehicleCount();
     Vehicle::displayTotalSpeed();
     cout << "Average Speed of All Vehicles: " << Vehicle::averageSpeed() << " km/h" << endl;
 
-    TrafficSignal *signals[2];
-    signals[0] = new TrafficSignal("Red", 30);
-    signals[1] = new TrafficSignal("Green", 45);
-
-    for (int i = 0; i < 2; i++)
-    {
-        signals[i]->displayStatus();
-        signals[i]->changeSignal(i == 0 ? "Green" : "Red");
-    }
-
-    /*
-     * Deleting the objects by calling destructors
-     */
     for (int i = 0; i < 3; i++)
     {
         delete vehicles[i];
-    }
-
-    for (int i = 0; i < 2; i++)
-    {
-        delete signals[i];
     }
 
     return 0;
