@@ -9,94 +9,45 @@ using namespace std;
 class VehicleBase
 {
 public:
-    virtual void move() = 0;        // Pure virtual function
-    virtual void displayInfo() = 0; // Virtual function
-    virtual ~VehicleBase() {}       // Virtual destructor
+    virtual void move() = 0;          // Pure virtual function
+    virtual void displayInfo() = 0;  // Virtual function
+    virtual ~VehicleBase() {}        // Virtual destructor
 };
 
 /*
  * Class to handle vehicle statistics
  */
-class VehicleStatistics
-{
+class VehicleStatistics {
 private:
     static int vehicleCount;
     static int totalSpeed;
 
 public:
-    static void incrementVehicle(int speed)
-    {
+    static void incrementVehicle(int speed) {
         vehicleCount++;
         totalSpeed += speed;
     }
 
-    static void decrementVehicle(int speed)
-    {
+    static void decrementVehicle(int speed) {
         vehicleCount--;
         totalSpeed -= speed;
     }
 
-    static void displayVehicleCount()
-    {
+    static void displayVehicleCount() {
         cout << "Total Vehicles: " << vehicleCount << endl;
     }
 
-    static void displayTotalSpeed()
-    {
+    static void displayTotalSpeed() {
         cout << "Total Speed of All Vehicles: " << totalSpeed << " km/h" << endl;
     }
 
-    static double averageSpeed()
-    {
+    static double averageSpeed() {
         return vehicleCount > 0 ? static_cast<double>(totalSpeed) / vehicleCount : 0;
     }
 };
 
 int VehicleStatistics::vehicleCount = 0;
 int VehicleStatistics::totalSpeed = 0;
-
-/*
- * Movement strategy interface following Open/Closed Principle
- */
-class MovementStrategy {
-public:
-    virtual void executeMove(const string& type, int speed) = 0;
-    virtual ~MovementStrategy() {}
-};
-
-/*
- * Concrete movement strategies
- */
-class StandardMovement : public MovementStrategy {
-public:
-    void executeMove(const string& type, int speed) override {
-        cout << type << " is moving at " << speed << " km/h." << endl;
-    }
-};
-
-class CarMovement : public MovementStrategy {
-public:
-    void executeMove(const string& type, int speed) override {
-        cout << type << " is cruising at " << speed << " km/h." << endl;
-    }
-};
-
-class BikeMovement : public MovementStrategy {
-public:
-    void executeMove(const string& type, int speed) override {
-        cout << type << " is pedaling at " << speed << " km/h." << endl;
-    }
-};
-
-class ElectricMovement : public MovementStrategy {
-private:
-    int batteryLevel;
-public:
-    ElectricMovement(int battery) : batteryLevel(battery) {}
-    void executeMove(const string& type, int speed) override {
-        cout << type << " is gliding at " << speed << " km/h with " << batteryLevel << "% battery." << endl;
-    }
-};
 
 /*
  * Class to represent a vehicle, inheriting from VehicleBase
@@ -106,11 +57,9 @@ class Vehicle : public VehicleBase
 private:
     string type;
     int speed;
-    MovementStrategy* moveStrategy;
 
 public:
-    Vehicle(string type, int speed, MovementStrategy* strategy) 
-        : type(type), speed(speed), moveStrategy(strategy)
+    Vehicle(string type, int speed) : type(type), speed(speed)
     {
         VehicleStatistics::incrementVehicle(speed);
     }
@@ -118,12 +67,11 @@ public:
     ~Vehicle()
     {
         VehicleStatistics::decrementVehicle(speed);
-        delete moveStrategy;
     }
 
     void move() override
     {
-        moveStrategy->executeMove(type, speed);
+        cout << this->type << " is moving at " << this->speed << " km/h." << endl;
     }
 
     void displayInfo() override
@@ -142,7 +90,12 @@ protected:
 class Car : public Vehicle
 {
 public:
-    Car(int speed) : Vehicle("Car", speed, new CarMovement()) {}
+    Car(int speed) : Vehicle("Car", speed) {}
+
+    void move() override
+    {
+        cout << "Car is cruising at " << getSpeed() << " km/h." << endl;
+    }
 
     void honkHorn()
     {
@@ -156,7 +109,12 @@ public:
 class Bike : public Vehicle
 {
 public:
-    Bike(int speed) : Vehicle("Bike", speed, new BikeMovement()) {}
+    Bike(int speed) : Vehicle("Bike", speed) {}
+
+    void move() override
+    {
+        cout << "Bike is pedaling at " << getSpeed() << " km/h." << endl;
+    }
 
     void pedal()
     {
@@ -167,14 +125,17 @@ public:
 /*
  * ElectricCar class inherits from Car
  */
-class ElectricCar : public Vehicle
+class ElectricCar : public Car
 {
     int batteryLevel;
 
 public:
-    ElectricCar(int speed, int batteryLevel) 
-        : Vehicle("Electric Car", speed, new ElectricMovement(batteryLevel)),
-          batteryLevel(batteryLevel) {}
+    ElectricCar(int speed, int batteryLevel) : Car(speed), batteryLevel(batteryLevel) {}
+
+    void move() override
+    {
+        cout << "Electric Car is gliding at " << getSpeed() << " km/h with " << batteryLevel << "% battery." << endl;
+    }
 
     void charge()
     {
@@ -244,9 +205,9 @@ int main()
 {
     // Create an array of pointers to VehicleBase
     VehicleBase *vehicles[3];
-    vehicles[0] = new Car(80);              // Car object
+    vehicles[0] = new Car(80);            // Car object
     vehicles[1] = new ElectricCar(50, 100); // ElectricCar object
-    vehicles[2] = new Bike(20);             // Bike object
+    vehicles[2] = new Bike(20);           // Bike object
 
     // Demonstrate polymorphism through the move() function
     for (int i = 0; i < 3; i++)
