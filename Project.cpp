@@ -105,6 +105,27 @@ public:
 };
 
 /*
+ * Interface for rechargeable vehicles
+ */
+class Rechargeable
+{
+public:
+    virtual void charge() = 0;
+    virtual int getBatteryLevel() const = 0;
+    virtual ~Rechargeable() {}
+};
+
+/*
+ * Interface for vehicles that can make sounds
+ */
+class SoundMaker
+{
+public:
+    virtual void makeSound() = 0;
+    virtual ~SoundMaker() {}
+};
+
+/*
  * Class to represent a vehicle, inheriting from VehicleBase
  */
 class Vehicle : public VehicleBase
@@ -138,19 +159,19 @@ public:
     }
 
 protected:
-    string getType() { return type; }
-    int getSpeed() { return speed; }
+    string getType() const { return type; }
+    int getSpeed() const { return speed; }
 };
 
 /*
- * Car class inherits from Vehicle
+ * Car class inherits from Vehicle and implements SoundMaker
  */
-class Car : public Vehicle
+class Car : public Vehicle, public SoundMaker
 {
 public:
     Car(int speed) : Vehicle("Car", speed, new CruisingMovement()) {}
 
-    void honkHorn()
+    void makeSound() override
     {
         cout << "HONK! HONK!" << endl;
     }
@@ -171,10 +192,11 @@ public:
 };
 
 /*
- * ElectricCar class inherits from Car
+ * ElectricCar class inherits from Vehicle and implements Rechargeable and SoundMaker
  */
-class ElectricCar : public Vehicle
+class ElectricCar : public Vehicle, public Rechargeable, public SoundMaker
 {
+private:
     int batteryLevel;
 
 public:
@@ -184,18 +206,89 @@ public:
 
     void move() override
     {
-        Vehicle::move();
+        if (batteryLevel > 0)
+        {
+            Vehicle::move();
+            batteryLevel--; // Simulate battery consumption
+        }
+        else
+        {
+            cout << "Cannot move: Battery depleted!" << endl;
+        }
+    }
+
+    void displayInfo() override
+    {
+        Vehicle::displayInfo();
         cout << "Battery Level: " << batteryLevel << "%" << endl;
     }
 
-    void charge()
+    // Implement Rechargeable interface
+    void charge() override
     {
-        cout << "Charging..." << endl;
+        batteryLevel = min(100, batteryLevel + 20);
+        cout << "Charging... Battery level now at " << batteryLevel << "%" << endl;
+    }
+
+    int getBatteryLevel() const override
+    {
+        return batteryLevel;
+    }
+
+    // Implement SoundMaker interface
+    void makeSound() override
+    {
+        cout << "Gentle Electric Hum!" << endl;
     }
 };
 
 /*
- * Example of how easy it is to add a new vehicle type without modifying existing code
+ * ElectricScooter class inherits from Vehicle and implements Rechargeable
+ */
+class ElectricScooter : public Vehicle, public Rechargeable
+{
+private:
+    int batteryLevel;
+
+public:
+    ElectricScooter(int speed, int batteryLevel)
+        : Vehicle("Electric Scooter", speed, new StandardMovement()),
+          batteryLevel(batteryLevel) {}
+
+    void move() override
+    {
+        if (batteryLevel > 0)
+        {
+            Vehicle::move();
+            batteryLevel--; // Simulate battery consumption
+        }
+        else
+        {
+            cout << "Cannot move: Battery depleted!" << endl;
+        }
+    }
+
+    void displayInfo() override
+    {
+        Vehicle::displayInfo();
+        cout << "Battery Level: " << batteryLevel << "%" << endl;
+    }
+
+    // Implement Rechargeable interface
+    void charge() override
+    {
+        batteryLevel = min(100, batteryLevel + 20);
+        cout << "Charging... Battery level now at " << batteryLevel << "%" << endl;
+    }
+
+    int getBatteryLevel() const override
+    {
+        return batteryLevel;
+    }
+};
+
+/*
+ * Scooter class inherits from Vehicle
  */
 class Scooter : public Vehicle
 {
@@ -209,51 +302,30 @@ public:
 class TrafficSignal
 {
 private:
-    /*
-     * Private variables of the TrafficSignal class
-     */
     string color;
     int timer;
 
 public:
-    /*
-     * Constructor to create a TrafficSignal object
-     * @param color the color of the traffic signal
-     * @param timer the timer of the traffic signal
-     */
     TrafficSignal(string color, int timer)
     {
         this->color = color;
         this->timer = timer;
     }
 
-    /*
-     * Method to change the color of a TrafficSignal object
-     * @param newColor the new color of the traffic signal
-     */
     void changeSignal(string newColor)
     {
         this->color = newColor;
         cout << "Traffic signal changed to " << this->color << endl;
     }
 
-    /*
-     * Method to display the status of a TrafficSignal object
-     */
     void displayStatus()
     {
         cout << "Traffic Signal: " << this->color << "\nTimer: " << this->timer << " seconds" << endl;
     }
 
-    /*
-     * Setter functions for color and timer
-     */
     void setColor(string color) { this->color = color; }
     void setTimer(int timer) { this->timer = timer; }
 
-    /*
-     * Getter functions for color and timer
-     */
     string getColor() { return color; }
     int getTimer() { return timer; }
 };
@@ -264,32 +336,54 @@ public:
 int main()
 {
     // Create an array of pointers to VehicleBase
-    VehicleBase *vehicles[4];               // Increased size to accommodate new vehicle type
-    vehicles[0] = new Car(80);              // Car object
-    vehicles[1] = new ElectricCar(50, 100); // ElectricCar object
-    vehicles[2] = new Bike(20);             // Bike object
-    vehicles[3] = new Scooter(30);          // New Scooter object
+    VehicleBase *vehicles[5];
+    vehicles[0] = new Car(80);
+    vehicles[1] = new ElectricCar(50, 100);
+    vehicles[2] = new Bike(20);
+    vehicles[3] = new ElectricScooter(30, 80);
+    vehicles[4] = new Scooter(25);
 
     // Demonstrate polymorphism through the move() function
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 5; i++)
     {
         vehicles[i]->displayInfo();
         vehicles[i]->move();
         cout << endl;
     }
 
-    // Specific functionality of derived classes
-    static_cast<Car *>(vehicles[0])->honkHorn();
-    static_cast<ElectricCar *>(vehicles[1])->charge();
-    static_cast<Bike *>(vehicles[2])->pedal();
+    // Demonstrate LSP with SoundMaker interface
+    SoundMaker *soundMakers[] = {
+        dynamic_cast<SoundMaker *>(vehicles[0]), // Car
+        dynamic_cast<SoundMaker *>(vehicles[1])  // ElectricCar
+    };
+
+    cout << "\nDemonstrating vehicle sounds:" << endl;
+    for (SoundMaker *sm : soundMakers)
+    {
+        if (sm)
+            sm->makeSound();
+    }
+
+    // Demonstrate LSP with Rechargeable interface
+    cout << "\nDemonstrating charging capabilities:" << endl;
+    for (int i = 0; i < 5; i++)
+    {
+        Rechargeable *rechargeable = dynamic_cast<Rechargeable *>(vehicles[i]);
+        if (rechargeable)
+        {
+            cout << "Charging vehicle " << i + 1 << ":" << endl;
+            rechargeable->charge();
+        }
+    }
 
     // Static member function calls using VehicleStatistics class
+    cout << "\nVehicle Statistics:" << endl;
     VehicleStatistics::displayVehicleCount();
     VehicleStatistics::displayTotalSpeed();
     cout << "Average Speed of All Vehicles: " << VehicleStatistics::averageSpeed() << " km/h" << endl;
 
     // Clean up dynamically allocated objects
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 5; i++)
     {
         delete vehicles[i];
     }
