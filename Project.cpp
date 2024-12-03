@@ -15,6 +15,41 @@ public:
 };
 
 /*
+ * Class to handle vehicle statistics
+ */
+class VehicleStatistics {
+private:
+    static int vehicleCount;
+    static int totalSpeed;
+
+public:
+    static void incrementVehicle(int speed) {
+        vehicleCount++;
+        totalSpeed += speed;
+    }
+
+    static void decrementVehicle(int speed) {
+        vehicleCount--;
+        totalSpeed -= speed;
+    }
+
+    static void displayVehicleCount() {
+        cout << "Total Vehicles: " << vehicleCount << endl;
+    }
+
+    static void displayTotalSpeed() {
+        cout << "Total Speed of All Vehicles: " << totalSpeed << " km/h" << endl;
+    }
+
+    static double averageSpeed() {
+        return vehicleCount > 0 ? static_cast<double>(totalSpeed) / vehicleCount : 0;
+    }
+};
+
+int VehicleStatistics::vehicleCount = 0;
+int VehicleStatistics::totalSpeed = 0;
+
+/*
  * Class to represent a vehicle, inheriting from VehicleBase
  */
 class Vehicle : public VehicleBase
@@ -24,19 +59,14 @@ private:
     int speed;
 
 public:
-    static int vehicleCount;
-    static int totalSpeed;
-
     Vehicle(string type, int speed) : type(type), speed(speed)
     {
-        vehicleCount++;
-        totalSpeed += speed;
+        VehicleStatistics::incrementVehicle(speed);
     }
 
     ~Vehicle()
     {
-        vehicleCount--;
-        totalSpeed -= speed;
+        VehicleStatistics::decrementVehicle(speed);
     }
 
     void move() override
@@ -49,28 +79,10 @@ public:
         cout << "Vehicle Type: " << this->type << "\nSpeed: " << this->speed << " km/h" << endl;
     }
 
-    static void displayVehicleCount()
-    {
-        cout << "Total Vehicles: " << vehicleCount << endl;
-    }
-
-    static void displayTotalSpeed()
-    {
-        cout << "Total Speed of All Vehicles: " << totalSpeed << " km/h" << endl;
-    }
-
-    static double averageSpeed()
-    {
-        return vehicleCount > 0 ? static_cast<double>(totalSpeed) / vehicleCount : 0;
-    }
-
 protected:
     string getType() { return type; }
     int getSpeed() { return speed; }
 };
-
-int Vehicle::vehicleCount = 0;
-int Vehicle::totalSpeed = 0;
 
 /*
  * Car class inherits from Vehicle
@@ -209,10 +221,10 @@ int main()
     static_cast<ElectricCar *>(vehicles[1])->charge();
     static_cast<Bike *>(vehicles[2])->pedal();
 
-    // Static member function calls
-    Vehicle::displayVehicleCount();
-    Vehicle::displayTotalSpeed();
-    cout << "Average Speed of All Vehicles: " << Vehicle::averageSpeed() << " km/h" << endl;
+    // Static member function calls using VehicleStatistics class
+    VehicleStatistics::displayVehicleCount();
+    VehicleStatistics::displayTotalSpeed();
+    cout << "Average Speed of All Vehicles: " << VehicleStatistics::averageSpeed() << " km/h" << endl;
 
     // Clean up dynamically allocated objects
     for (int i = 0; i < 3; i++)
@@ -222,4 +234,3 @@ int main()
 
     return 0;
 }
-
